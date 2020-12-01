@@ -1,0 +1,10 @@
+# Folders
+.idea/
+.vs/
+bin/
+obj/
+
+# File extensions
+*.user
+
+# Specific files
