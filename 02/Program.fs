@@ -13,31 +13,27 @@ let main _ =
         File.ReadAllLines("input.txt")
         |> Array.map (fun a ->
             match a with
-            | Regex @"(\d+)-(\d+) ([a-z]): ([a-z]+)" [ min; max; char; password ] ->
-                Some(int min, int max, char.[0], password)
+            | Regex @"(\d+)-(\d+) ([a-z]): ([a-z]+)" [ pos1; pos2; char; password ] ->
+                Some(int pos1, int pos2, char.[0], password)
             | _ -> None)
         |> Array.choose id
     
-    let answer1 =
-        entries
-        |> Seq.filter (fun (min, max, char, password) ->
-            let actual =
-                password
-                |> Seq.where (fun c -> c = char)
-                |> Seq.length
-            actual >= min && actual <= max)
-        |> Seq.length
-
-    printfn "Answer 1: %i" answer1
+    entries
+    |> Seq.filter (fun (min, max, char, password) ->
+        let actual =
+            password
+            |> Seq.where (fun c -> c = char)
+            |> Seq.length
+        actual >= min && actual <= max)
+    |> Seq.length
+    |> printfn "Answer 1: %i"
     
-    let answer2 =
-        entries
-        |> Seq.filter (fun (min, max, char, password) ->
-            match (Seq.tryItem (min - 1) password, Seq.tryItem (max - 1) password) with
-            | (Some c1, Some c2) -> (c1 = char || c2 = char) && not (c1 = char && c2 = char)
-            | _ -> false)
-        |> Seq.length
-
-    printfn "Answer 2: %i" answer2
+    entries
+    |> Seq.filter (fun (pos1, pos2, char, password) ->
+        let c1 = password.[pos1 - 1]
+        let c2 = password.[pos2 - 1]
+        (c1 = char && c2 <> char) || (c1 <> char && c2 = char))
+    |> Seq.length
+    |> printfn "Answer 2: %i"
 
     0 // return an integer exit code
