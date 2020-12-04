@@ -38,24 +38,24 @@ let main _ =
     let isValidPolicy2 (passport: Map<string, string>) =
         let byr =
             match passport.TryFind "byr" with
-            | Some (Int y) when 1920 <= y && y <= 2002 -> true
+            | Some (Regex "^(\d{4})$" [y]) when 1920 <= (int y) && (int y) <= 2002 -> true
             | _ -> false
         let iyr =
             match passport.TryFind "iyr" with
-            | Some (Int y) when 2010 <= y && y <= 2020 -> true
+            | Some (Regex "^(\d{4})$" [y]) when 2010 <= (int y) && (int y) <= 2020 -> true
             | _ -> false
         let eyr =
             match passport.TryFind "eyr" with
-            | Some (Int y) when 2020 <= y && y <= 2030 -> true
+            | Some (Regex "^(\d{4})$" [y]) when 2020 <= (int y) && (int y) <= 2030 -> true
             | _ -> false
         let hgt =
             match passport.TryFind "hgt" with
-            | Some (Regex "(\d\d\d)cm" [cm]) -> 150 <= (int cm) && (int cm) <= 193
-            | Some (Regex "(\d\d)in" [inch]) -> 59 <= (int inch) && (int inch) <= 76
+            | Some (Regex "^(\d{3})cm$" [cm]) -> 150 <= (int cm) && (int cm) <= 193
+            | Some (Regex "^(\d{2})in$" [inch]) -> 59 <= (int inch) && (int inch) <= 76
             | _ -> false
         let hcl =
             match passport.TryFind "hcl" with
-            | Some (Regex "#[0-9a-f]{6}" _) -> true
+            | Some (Regex "^#[0-9a-f]{6}$" _) -> true
             | _ -> false
         let ecl =
             match passport.TryFind "ecl" with
