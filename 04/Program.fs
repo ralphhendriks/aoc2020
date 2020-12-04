@@ -2,11 +2,6 @@ open System
 open System.IO
 open System.Text.RegularExpressions
 
-let (|Int|_|) (str:string) =
-    match Int32.TryParse str with
-    | true,int -> Some int
-    | _ -> None
-
 let (|Regex|_|) pattern input =
     let m = Regex.Match(input, pattern)
     if m.Success
