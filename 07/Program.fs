@@ -12,29 +12,24 @@ let main _ =
             then (b.[0], [])
             else (b.[0], [ for i in 0 .. m.Count - 1 -> (int (m.Item i).Groups.[1].Value, (m.Item i).Groups.[2].Value) ]))
         |> Map.ofArray
+        
+    let allBagTypes = luggageRules |> Map.toList |> List.map fst
 
     let rec bagsContainedBy (qty, color) =
-        match luggageRules.TryFind color with
-        | Some [] -> [(qty, color)]
-        | Some containedBags ->
-            let a =
-                containedBags
-                |> List.map (fun (q, c) ->  bagsContainedBy (q * qty, c))
-                |> List.concat
-            (qty, color) :: a
-        | None -> failwith "no luggage rule specified for color"
-        
-    seq { for KeyValue(key, _) in luggageRules do yield key }     
-    |> Seq.filter (fun c -> c <> "shiny gold")
-    |> Seq.map (fun c -> bagsContainedBy (1, c))
-    |> Seq.filter (fun l -> l |> List.exists (fun (_, c) -> c = "shiny gold"))
-    |> Seq.length
+        match Map.find color luggageRules with
+        | [] -> []
+        | containedBags -> List.collect (fun (q, c) -> (q * qty, c) :: bagsContainedBy (q * qty, c)) containedBags
+
+    allBagTypes
+    |> List.filter (fun c -> c <> "shiny gold")
+    |> List.map (fun c -> bagsContainedBy (1, c))
+    |> List.filter (fun l -> l |> List.exists (fun (_, c) -> c = "shiny gold"))
+    |> List.length
     |> printfn "Answer 1: %i"
-    
+
     bagsContainedBy (1, "shiny gold")
-    |> Seq.map fst
-    |> Seq.sum
-    |> fun i -> i - 1 // the shiny gold bag itself does not count
+    |> List.map fst
+    |> List.sum
     |> printfn "Answer 2: %i"
-    
+
     0 // return an integer exit code
