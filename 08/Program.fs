@@ -13,34 +13,28 @@ let main _ =
             | [| instr; arg1 |] -> (instr, int arg1)
             | _ -> failwith "syntax error" )
         
-    let rec cycle (program: (string * int )[]) visited (instr, acc) =
-        if instr >= program.Length then Terminated(instr, acc)
-        elif Set.contains instr visited then LoopDetected(instr, acc)
+    let rec runGameConsole (program: (string * int )[]) visited (ptr, acc) =
+        if ptr >= program.Length then Terminated(ptr, acc)
+        elif Set.contains ptr visited then LoopDetected(ptr, acc)
         else
-            match program.[instr] with
-            | ("acc", arg1) -> cycle program (Set.add instr visited) (instr + 1, acc + arg1)
-            | ("jmp", arg1) -> cycle program (Set.add instr visited) (instr + arg1, acc)
-            | ("nop", _) -> cycle program (Set.add instr visited) (instr + 1, acc)
+            match program.[ptr] with
+            | ("acc", arg1) -> runGameConsole program (Set.add ptr visited) (ptr + 1, acc + arg1)
+            | ("jmp", arg1) -> runGameConsole program (Set.add ptr visited) (ptr + arg1, acc)
+            | ("nop", _) -> runGameConsole program (Set.add ptr visited) (ptr + 1, acc)
             | _ -> failwith "invalid instruction"
     
-    match cycle program Set.empty (0, 0) with
+    match runGameConsole program Set.empty (0, 0) with
     | LoopDetected(_, acc) -> printfn "Answer 1: %i" acc
     | _ -> failwith "No infinite loop found"
     
     seq { 0 .. program.Length - 1 }
     |> Seq.filter (fun i -> (fst program.[i]) = "nop" || (fst program.[i]) = "jmp")
-    |> Seq.map (fun i ->
-        let copy = Array.copy program
-        copy.[i] <- ((if (fst copy.[i] = "nop") then "jmp" else "nop"), snd copy.[i])
-        cycle copy Set.empty (0, 0))
-    |> Seq.find (fun result ->
-        match result with
-        | Terminated _ -> true
-        | _ -> false)
-    |> fun t ->
-        match t with
-        | Terminated (_, acc) -> acc
-        | _ -> failwith "invalid state"
+    |> Seq.pick (fun i ->
+        let programCopy = Array.copy program
+        programCopy.[i] <- ((if (fst programCopy.[i] = "nop") then "jmp" else "nop"), snd programCopy.[i])
+        match runGameConsole programCopy Set.empty (0, 0) with
+        | Terminated(_, acc) -> Some acc
+        | _ -> None)
     |> printfn "Answer 2: %i"
     
     0 // return an integer exit code
