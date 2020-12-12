@@ -1,23 +1,11 @@
 open System.IO
 
-type Action =
-    | North
-    | South
-    | East
-    | West
-    | Left
-    | Right
-    | Forward
+type Action = | North| South| East| West| Left| Right| Forward
 
-type Direction =
-    | N
-    | S
-    | E
-    | W
+type Direction = | N | S | E | W
 
 [<EntryPoint>]
 let main _ =
-
     let charToAction =
         function
         | 'N' -> North
@@ -52,7 +40,6 @@ let main _ =
         | (Left, _) | (Right, _) -> failwith "Unknown turn"
   
     let rotateCW (x, y, wx, wy) = (x, y, wy, -wx)
-    
     let rotateCCW (x, y, wx, wy) = (x, y, -wy, wx)
 
     let navigateWithNewInstructions (x, y, wx, wy) (action, v) =
