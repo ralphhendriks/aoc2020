@@ -10,17 +10,13 @@ let main _ =
 
     let numberSpoken turn =
         [ 1 .. turn ]
-        |> List.fold (fun (history: int list, indices) n ->
+        |> List.fold (fun (last, indices) n ->
             let next =
                 if n <= startingNumbers.Length then startingNumbers.[n - 1]
-                elif Map.containsKey history.Head indices then n - indices.[history.Head] - 1
+                elif Map.containsKey last indices then n - indices.[last] - 1
                 else 0
-            next :: history,
-            match history with
-            | [] -> indices
-            | x :: _ -> Map.add x (n - 1) indices) ([], Map.empty)
+            next, Map.add last (n - 1) indices) (0, Map.empty)
         |> fst
-        |> List.head
 
     numberSpoken 2020 |> printfn "Answer 1: %i"
     numberSpoken 30000000 |> printfn "Answer 2: %i"
