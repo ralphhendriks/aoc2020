@@ -1,6 +1,8 @@
 # Folders
 .idea/
+.ionide/
 .vs/
+.vscode/
 bin/
 obj/
 
